@@ -3,9 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cricket player showcase</title>
+    <title>Cricket Legends Hub</title>
+    <!-- Include Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #1a472a;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                        url('/api/placeholder/1920/1080') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 1rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Common Section Styles */
+        section {
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1a472a;
+        }
+
+        /* Featured Players */
+        .featured-players {
+            background-color: #f5f5f5;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .player-image {
+            width: 100%;
+            height: 200px;
+            background: url('/api/placeholder/400/320') center/cover;
+        }
+
+        .player-info {
+            padding: 1.5rem;
+        }
+
+        .player-info h3 {
+            color: #1a472a;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Map Section */
+        #map {
+            height: 500px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+
+        /* Top Matches */
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .match-video {
+            width: 100%;
+            height: 200px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .match-info {
+            padding: 1.5rem;
+        }
+
+        /* Fan Zone */
+        .fan-zone {
+            background-color: #f5f5f5;
+        }
+
+        .vote-section {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .player-vote {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .vote-button {
+            background-color: #1a472a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .vote-button:hover {
+            background-color: #2c6a3f;
+        }
+
+        .story-form {
+            margin-top: 2rem;
+        }
+
+        .story-form textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .submit-button {
+            background-color: #1a472a;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #2c6a3f;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1a472a;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>cricket player </h1>
+    <nav>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#players">Players</a>
+            <a href="#map">Player Map</a>
+            <a href="#matches">Top Matches</a>
+            <a href="#fanzone">Fan Zone</a>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Cricket Legends Hub</h1>
+            <p>Discover the extraordinary stories and achievements of cricket's greatest players. From record-breaking performances to unforgettable moments, explore the rich history of cricket through its legendary personalities.</p>
+        </div>
+    </section>
+
+    <section class="featured-players" id="players">
+        <h2 class="section-title">Featured Players</h2>
+        <div class="players-grid">
+            <div class="player-card">
+                <div class="player-image"></div>
+                <div class="player-info">
+                    <h3>Sachin Tendulkar</h3>
+                    <p>The Master Blaster from India, holder of numerous batting records.</p>
+                </div>
+            </div>
+            <div class="player-card">
+                <div class="player-image"></div>
+                <div class="player-info">
+                    <h3>Shane Warne</h3>
+                    <p>Australian spin wizard known for his legendary leg breaks.</p>
+                </div>
+            </div>
+            <div class="player-card">
+                <div class="player-image"></div>
+                <div class="player-info">
+                    <h3>Brian Lara</h3>
+                    <p>West Indies batting legend known for his elegant stroke play.</p>
+                </div>
+            </div>
+            <div class="player-card">
+                <div class="player-image"></div>
+                <div class="player-info">
+                    <h3>Jacques Kallis</h3>
+                    <p>South African all-rounder, master of both bat and ball.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="map-section">
+        <h2 class="section-title">Player Origins</h2>
+        <div id="map"></div>
+    </section>
+
+    <section id="matches">
+        <h2 class="section-title">Top Matches</h2>
+        <div class="matches-grid">
+            <div class="match-card">
+                <div class="match-video">
+                    <img src="/api/placeholder/400/320" alt="Match Highlight Placeholder">
+                </div>
+                <div class="match-info">
+                    <h3>2011 World Cup Final</h3>
+                    <p>India vs Sri Lanka - The historic match where India lifted the World Cup after 28 years.</p>
+                </div>
+            </div>
+            <div class="match-card">
+                <div class="match-video">
+                    <img src="/api/placeholder/400/320" alt="Match Highlight Placeholder">
+                </div>
+                <div class="match-info">
+                    <h3>438 Game</h3>
+                    <p>South Africa vs Australia - The greatest ODI chase in history.</p>
+                </div>
+            </div>
+            <div class="match-card">
+                <div class="match-video">
+                    <img src="/api/placeholder/400/320" alt="Match Highlight Placeholder">
+                </div>
+                <div class="match-info">
+                    <h3>2005 Ashes Test</h3>
+                    <p>England vs Australia - The legendary Edgbaston Test.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="fan-zone" id="fanzone">
+        <h2 class="section-title">Fan Zone</h2>
+        <div class="vote-section">
+            <h3>Vote for the Greatest Player</h3>
+            <div class="player-vote">
+                <span>Sachin Tendulkar</span>
+                <button class="vote-button" onclick="vote(1)">Vote</button>
+            </div>
+            <div class="player-vote">
+                <span>Shane Warne</span>
+                <button class="vote-button" onclick="vote(2)">Vote</button>
+            </div>
+            <div class="player-vote">
+                <span>Brian Lara</span>
+                <button class="vote-button" onclick="vote(3)">Vote</button>
+            </div>
+            
+            <div class="story-form">
+                <h3>Share Your Cricket Story</h3>
+                <textarea placeholder="Tell us your favorite cricket memory..."></textarea>
+                <button class="submit-button" onclick="submitStory()">Submit Story</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Cricket Legends Hub. All rights reserved.</p>
+    </footer>
+
+    <!-- Include Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
+    
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Initialize map
+        const map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add markers for player locations
+        const players = [
+            { name: "Sachin Tendulkar", lat: 19.0760, lng: 72.8777 },
+            { name: "Shane Warne", lat: -37.8136, lng: 144.9631 },
+            { name: "Brian Lara", lat: 10.6918, lng: -61.2225 },
+            { name: "Jacques Kallis", lat: -33.9249, lng: 18.4241 }
+        ];
+
+        players.forEach(player => {
+            L.marker([player.lat, player.lng])
+                .bindPopup(player.name)
+                .addTo(map);
+        });
+
+        // Voting system
+        let votes = {
+            1: 0,
+            2: 0,
+            3: 0
+        };
+
+        function vote(playerId) {
+            votes[playerId]++;
+            alert("Thank you for voting!");
+        }
+
+        function submitStory() {
+            const story = document.querySelector('textarea').value;
+            if (story.trim()) {
+                alert("Thank you for sharing your story!");
+                document.querySelector('textarea').value = '';
+            } else {
+                alert("Please write your story before submitting.");
+            }
+        }
+
+        // Add animation class to player cards when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.player-card, .match-card').forEach((card) => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            observer.observe(card);
+        });
+    </script>
 </body>
 </html>
